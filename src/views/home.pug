@@ -9,5 +9,12 @@ html(lang="en")
         header 
             h1 Noom 
         main
+            ul
+            form#nick
+                input(type="text", placeholder="닉네임을 작성 해주세요.", required) 
+                button 저장
+            form#message
+                input(type="text", placeholder="메세지를 작성 해주세요.", required) 
+                button 전송
             h2 Welvome to Noom
         script(src="/public/js/app.js")
