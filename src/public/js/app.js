@@ -2,9 +2,9 @@
 const socket = io();
 
 const welcome = document.getElementById("welcome");
-const form = welcome.querySelector("form");
+const nameForm = welcome.querySelector("#name");
+const form = welcome.querySelector("#roomname");
 const room = document.getElementById("room");
-
 room.hidden = true;
 
 let roomName;
@@ -16,11 +16,30 @@ function addMessage(message) {
   ul.appendChild(li);
 }
 
+function handleMessageSubmit(event) {
+  event.preventDefault();
+  const input = room.querySelector("#msg input");
+  const value = input.value;
+
+  socket.emit("new_message", input.value, roomName, () => {
+    addMessage(`You: ${value}`);
+  });
+  input.value = "";
+}
+
+function handleNicknameSubmit(event) {
+  event.preventDefault();
+  const input = welcome.querySelector("#name input");
+  socket.emit("nickname", input.value);
+}
+
 function showRoom() {
   welcome.hidden = true;
   room.hidden = false;
   const h3 = room.querySelector("h3");
   h3.innerText = `Room ${roomName}`;
+  const msgForm = room.querySelector("#msg");
+  msgForm.addEventListener("submit", handleMessageSubmit);
 }
 
 function handleRoomSubmit(event) {
@@ -31,10 +50,18 @@ function handleRoomSubmit(event) {
   input.value = "";
 }
 form.addEventListener("submit", handleRoomSubmit);
+nameForm.addEventListener("submit", handleNicknameSubmit);
 
-socket.on("welcome", () => {
-  addMessage("someone joined!");
+socket.on("welcome", (user) => {
+  addMessage(`${user}님이 입장 하셨습니다.`);
 });
+
+socket.on("bye", (left) => {
+  addMessage(`${left}님이 나갔습니다.`);
+});
+
+socket.on("new_message", addMessage);
+
 // 웹소캣
 // const messageList = document.querySelector("ul");
 // const nickForm = document.querySelector("#nick");
